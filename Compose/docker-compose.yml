@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: kavishkaravishan/mysql:latest
+    container_name: mysql-container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: library_management_docker
+    ports:
+      - "3308:3306"
+
+  backend:
+    image: kavishkaravishan/library-image:latest 
+    container_name: backend_container
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/library_management_docker
+    ports:
+      - "9090:9090"
+
+  frontend:
+    image: kavishkaravishan/vite-frontend:latest  
+    container_name: frontend_container
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+
+
+
+
+
