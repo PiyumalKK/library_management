@@ -1,48 +1,28 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.8.1-openjdk-11'
-            args '-v $HOME/.m2:/root/.m2'
-        }
-    }
-    environment {
-        ACR_NAME = 'myacr'
-        ACR_URL = 'myacr.azurecr.io'
-    }
+    agent any
     stages {
         stage('Checkout Code') {
             steps {
-                checkout scm
+                // Replace with your repository URL if needed
+                git 'https://github.com/PiyumalKK/library_management.git'
             }
         }
-        stage('Build Backend') {
-            steps {
-                dir('Backend') {
-                    sh 'mvn clean package'
-                }
-            }
-        }
-        stage('Build Frontend') {
-            steps {
-                dir('Frontend') {
-                    sh 'npm install && npm run build'
-                }
-            }
-        }
-        stage('Docker Build & Push') {
+        stage('Build Docker Images') {
             steps {
                 script {
-                    sh "docker build -t $ACR_URL/backend:latest Backend/"
-                    sh "docker build -t $ACR_URL/frontend:latest Frontend/"
-                    sh "docker login $ACR_URL -u <your-username> -p <your-password>"
-                    sh "docker push $ACR_URL/backend:latest"
-                    sh "docker push $ACR_URL/frontend:latest"
+                    // Build images using Docker Compose
+                    sh 'docker-compose -f Compose/docker-compose.yml build'
                 }
             }
         }
-        stage('Deploy to Kubernetes') {
+        stage('Deploy to Azure') {
             steps {
-                sh 'kubectl apply -f k8s/'
+                script {
+                    // Get AKS credentials (replace placeholders with your actual values)
+                    sh 'az aks get-credentials --resource-group Devops --name librarydev --overwrite-existing'
+                    // Apply your Kubernetes deployment file
+                    sh 'kubectl apply -f kubernetes/deployment.yml'
+                }
             }
         }
     }
