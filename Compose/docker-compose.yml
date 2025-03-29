@@ -1,38 +1,39 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  mysql:
-    image: kavishkaravishan/mysql:latest
-    container_name: mysql-container
-    restart: always
+  db:
+    image: mysql:8.0
+    container_name: db
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: library_management_docker
+      MYSQL_ROOT_PASSWORD: foreverSmile
+      MYSQL_DATABASE: MyLibrary
     ports:
-      - "3308:3306"
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
 
   backend:
-    image: kavishkaravishan/library-image:latest 
-    container_name: backend_container
-    restart: always
-    depends_on:
-      - mysql
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/library_management_docker
+    build:
+      context: ../backend
+      dockerfile: Dockerfile   # Change to Dockerfile.backend if needed
+    container_name: backend
+    restart: unless-stopped
     ports:
       - "9090:9090"
+    depends_on:
+      - db
 
   frontend:
-    image: kavishkaravishan/vite-frontend:latest  
-    container_name: frontend_container
-    restart: always
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile   # Change to Dockerfile.frontend if needed
+    container_name: frontend
+    restart: unless-stopped
     ports:
-      - "5173:80"
+      - "80:80"
     depends_on:
       - backend
 
-
-
-
-
-
+volumes:
+  mysql_data:
