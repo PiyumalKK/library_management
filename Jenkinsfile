@@ -11,7 +11,7 @@ pipeline {
             steps {
                 script {
                     // Build images using Docker Compose
-                    sh 'docker-compose -f Compose/docker-compose.yml build'
+                    sh 'docker-compose -f /var/jenkins_home/workspace/Library/Compose/docker-compose.yml build'
                 }
             }
         }
