@@ -1,24 +1,31 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'maven:3.8.1-openjdk-11'
+            args '-v $HOME/.m2:/root/.m2'
+        }
+    }
     stages {
         stage('Build Backend') {
             steps {
                 dir('Backend') {
-                    sh 'docker build -t myapp-backend:latest .'
+                    sh 'echo "Building backend..."'
+                    // Add your non-Docker build commands here
                 }
             }
         }
         stage('Build Frontend') {
             steps {
                 dir('Frontend') {
-                    sh 'docker build -t myapp-frontend:latest .'
+                    sh 'echo "Building frontend..."'
+                    // Add your non-Docker build commands here
                 }
             }
         }
-        stage('Deploy Locally') {
+        stage('Deploy') {
             steps {
-                sh 'docker-compose down || true'
-                sh 'docker-compose up -d'
+                sh 'echo "Deploying application..."'
+                // Add your deployment commands here
             }
         }
     }
