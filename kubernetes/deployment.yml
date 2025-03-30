@@ -35,6 +35,43 @@
 #       targetPort: 80
 #   type: LoadBalancer
 
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: my-app-deployment
+# spec:
+#   replicas: 2
+#   selector:
+#     matchLabels:
+#       app: my-app
+#   template:
+#     metadata:
+#       labels:
+#         app: my-app
+#     spec:
+#       containers:
+#       - name: backend
+#         image: librarycontainer.azurecr.io/backend:latest
+#         ports:
+#         - containerPort: 8080
+#       - name: frontend
+#         image: librarycontainer.azurecr.io/frontend:latest
+#         ports:
+#         - containerPort: 80
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: my-app-service
+# spec:
+#   selector:
+#     app: my-app
+#   ports:
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 80
+#   type: LoadBalancer
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -49,6 +86,8 @@ spec:
       labels:
         app: my-app
     spec:
+      imagePullSecrets:
+      - name: acr-auth
       containers:
       - name: backend
         image: librarycontainer.azurecr.io/backend:latest
@@ -67,7 +106,7 @@ spec:
   selector:
     app: my-app
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
+  - protocol: TCP
+    port: 80
+    targetPort: 80
   type: LoadBalancer
