@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'docker:dind' // Consider using a custom image that includes docker-compose and azure-cli
+            image 'docker:latest' // Consider using a custom image that includes docker-compose and azure-cli
             args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
