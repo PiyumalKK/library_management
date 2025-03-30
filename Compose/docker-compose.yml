@@ -55,17 +55,34 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
+  # backend:
+  #   build:
+  #     context: ../Backend
+  #     dockerfile: Dockerfile
+  #   image: LibraryContainer.azurecr.io/backend:latest  # Tag for ACR
+  #   container_name: backend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "9090:9090"
+  #   depends_on:
+  #     - db
   backend:
-    build:
-      context: ../Backend
-      dockerfile: Dockerfile
-    image: LibraryContainer.azurecr.io/backend:latest  # Tag for ACR
-    container_name: backend
-    restart: unless-stopped
-    ports:
-      - "9090:9090"
-    depends_on:
-      - db
+  build:
+    context: ../Backend
+    dockerfile: Dockerfile
+  image: LibraryContainer.azurecr.io/backend:latest
+  container_name: backend
+  restart: unless-stopped
+  ports:
+    - "9090:9090"
+  environment:
+    - DB_HOST=db
+    - DB_PORT=3306
+    - DB_NAME=MyLibrary
+    - DB_USER=root
+    - DB_PASSWORD=foreverSmile
+  depends_on:
+    - db
 
   frontend:
     build:

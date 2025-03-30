@@ -44,6 +44,14 @@ pipeline {
                 '''
             }
         }
+        stage('Build Backend JAR') {
+    steps {
+        dir('Backend') {  // Go to Backend directory
+            bat 'mvn clean package'  // Run Maven build
+        }
+    }
+}
+
 
         stage('Build and Tag Docker Images') {
             steps {
