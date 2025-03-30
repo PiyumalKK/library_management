@@ -57,7 +57,7 @@ services:
 
   backend:
     build:
-      context: /var/jenkins_home/workspace/Library/Backend
+      context: ../Backend
       dockerfile: Dockerfile
     image: LibraryContainer.azurecr.io/backend:latest  # Tag for ACR
     container_name: backend
@@ -69,7 +69,7 @@ services:
 
   frontend:
     build:
-      context: /var/jenkins_home/workspace/Library/Frontend
+      context: ../Frontend
       dockerfile: Dockerfile
     image: LibraryContainer.azurecr.io/frontend:latest  # Tag for ACR
     container_name: frontend
