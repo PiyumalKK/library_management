@@ -13,24 +13,25 @@ pipeline {
         AZ_TENANT_ID = '4f7d0492-1764-4824-8f60-f15e6d51cd70'
     }
     
-    stages {
-        stage('Prepare Environment') {
-            steps {
-                // Install essential tools in the Docker container
-                sh 'apk add --no-cache git docker-compose python3 py3-pip'
-                sh 'pip install azure-cli'
-            }
-        }
+    stage('Prepare Environment') {
+    steps {
+        // Install Git first
+        sh 'apk add --no-cache git'
+        // Then install the rest
+        sh 'apk add --no-cache docker-compose python3 py3-pip'
+        sh 'pip install azure-cli'
+    }
+}
         
         stage('Checkout Code') {
-            steps {
-                // Use Jenkins' built-in checkout mechanism for SCM
-                checkout([$class: 'GitSCM', 
-                    branches: [[name: '*/master']],
-                    userRemoteConfigs: [[url: 'https://github.com/PiyumalKK/library_management.git']]
-                ])
-            }
-        }
+    steps {
+        // Clean workspace before checkout
+        deleteDir()
+        
+        // Explicit git checkout
+        sh 'git clone https://github.com/PiyumalKK/library_management.git .'
+    }
+}
         
         stage('Build Docker Images') {
             steps {
