@@ -51,11 +51,11 @@ spec:
     spec:
       containers:
       - name: backend
-        image: LibraryContainer.azurecr.io/backend:latest
+        image: librarycontainer.azurecr.io/backend:latest
         ports:
         - containerPort: 8080
       - name: frontend
-        image: LibraryContainer.azurecr.io/frontend:latest
+        image: librarycontainer.azurecr.io/frontend:latest
         ports:
         - containerPort: 80
 ---
