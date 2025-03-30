@@ -59,7 +59,7 @@ services:
     build:  # ✅ Fixed indentation issue here
       context: ../Backend
       dockerfile: Dockerfile
-    image: librarycontainer.azurecr.io/backend:latest  # Tag for ACR
+    image: LibraryContainer.azurecr.io/backend:latest  # Tag for ACR
     container_name: backend
     restart: unless-stopped
     ports:
@@ -77,7 +77,7 @@ services:
     build:
       context: ../Frontend
       dockerfile: Dockerfile
-    image: librarycontainer.azurecr.io/frontend:latest  # Tag for ACR
+    image: LibraryContainer.azurecr.io/frontend:latest  # Tag for ACR
     container_name: frontend
     restart: unless-stopped
     ports:
