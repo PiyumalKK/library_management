@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        AZURE_CREDENTIALS = credentials('azure-credentials')
-        AZ_TENANT_ID = '4f7d0492-1764-4824-8f60-f15e6d51cd70'
-        ACR_NAME = 'LibraryContainer'
-        ACR_LOGIN_SERVER = "${ACR_NAME}.azurecr.io"
-    }
+    AZURE_CREDENTIALS = credentials('azure-credentials')
+    AZ_TENANT_ID = '4f7d0492-1764-4824-8f60-f15e6d51cd70'
+    ACR_NAME = 'librarycontainer' 
+    ACR_LOGIN_SERVER = "${ACR_NAME}.azurecr.io"
+}
 
     stages {
         stage('Prepare Environment') {
@@ -37,13 +37,13 @@ pipeline {
         }
 
         stage('Login to ACR') {
-            steps {
-                bat '''
-                    az login --service-principal -u %AZURE_CREDENTIALS_USR% -p %AZURE_CREDENTIALS_PSW% --tenant %AZ_TENANT_ID%
-                    az acr login --name %ACR_NAME%
-                '''
-            }
-        }
+    steps {
+        bat '''
+            az login --service-principal -u %AZURE_CREDENTIALS_USR% -p %AZURE_CREDENTIALS_PSW% --tenant %AZ_TENANT_ID%
+            docker login %ACR_LOGIN_SERVER% -u %AZURE_CREDENTIALS_USR% -p %AZURE_CREDENTIALS_PSW%
+        '''
+    }
+}
         stage('Build Backend JAR') {
     steps {
         dir('Backend') {  // Go to Backend directory
