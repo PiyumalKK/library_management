@@ -26,7 +26,7 @@ pipeline {
             steps {
                 // Use Jenkins' built-in checkout mechanism for SCM
                 checkout([$class: 'GitSCM', 
-                    branches: [[name: '*/main']],
+                    branches: [[name: '*/master']],
                     userRemoteConfigs: [[url: 'https://github.com/PiyumalKK/library_management.git']]
                 ])
             }
