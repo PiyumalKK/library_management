@@ -1,8 +1,10 @@
 pipeline {
     agent {
-         docker {
+        docker {
             image 'docker:latest'
             args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+            // Start container in the workspace directory explicitly
+            reuseNode true
         }
     }
     
@@ -12,18 +14,26 @@ pipeline {
     }
     
     stages {
+        stage('Prepare Environment') {
+            steps {
+                // Install essential tools in the Docker container
+                sh 'apk add --no-cache git docker-compose python3 py3-pip'
+                sh 'pip install azure-cli'
+            }
+        }
+        
         stage('Checkout Code') {
             steps {
-                // Install Git in the Docker container (Alpine-based)
-                sh 'apk add --no-cache git'
-                // Checkout the repository
-                git 'https://github.com/PiyumalKK/library_management.git'
+                // Use Jenkins' built-in checkout mechanism for SCM
+                checkout([$class: 'GitSCM', 
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/PiyumalKK/library_management.git']]
+                ])
             }
         }
         
         stage('Build Docker Images') {
             steps {
-                sh 'apk add --no-cache docker-compose'
                 sh 'cd Compose && docker-compose build'
                 sh 'cd Compose && docker-compose push'
             }
@@ -31,16 +41,14 @@ pipeline {
         
         stage('Deploy to Azure') {
             steps {
-                sh 'apk add --update python3 py3-pip'
-                sh 'pip install azure-cli'
                 sh '''
                     az login --service-principal \
                         -u ${AZURE_CREDENTIALS_USR} \
                         -p ${AZURE_CREDENTIALS_PSW} \
                         --tenant ${AZ_TENANT_ID}
+                    az aks get-credentials --resource-group Devops --name librarydev --overwrite-existing
+                    kubectl apply -f kubernetes/deployment.yml
                 '''
-                sh 'az aks get-credentials --resource-group Devops --name librarydev --overwrite-existing'
-                sh 'kubectl apply -f kubernetes/deployment.yml'
             }
         }
     }
