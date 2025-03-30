@@ -1,42 +1,44 @@
-# version: "3.8"
+# # version: "3.8"
 
-# services:
-#   db:
-#     image: mysql:8.0
-#     container_name: db
-#     restart: unless-stopped
-#     environment:
-#       MYSQL_ROOT_PASSWORD: foreverSmile
-#       MYSQL_DATABASE: MyLibrary
-#     ports:
-#       - "3306:3306"
-#     volumes:
-#       - mysql_data:/var/lib/mysql
+# # services:
+# #   db:
+# #     image: mysql:8.0
+# #     container_name: db
+# #     restart: unless-stopped
+# #     environment:
+# #       MYSQL_ROOT_PASSWORD: foreverSmile
+# #       MYSQL_DATABASE: MyLibrary
+# #     ports:
+# #       - "3306:3306"
+# #     volumes:
+# #       - mysql_data:/var/lib/mysql
 
-#   backend:
-#     build:
-#       context: ../backend
-#       dockerfile: Dockerfile   # Change to Dockerfile.backend if needed
-#     container_name: backend
-#     restart: unless-stopped
-#     ports:
-#       - "9090:9090"
-#     depends_on:
-#       - db
+# #   backend:
+# #     build:
+# #       context: ../backend
+# #       dockerfile: Dockerfile   # Change to Dockerfile.backend if needed
+# #     container_name: backend
+# #     restart: unless-stopped
+# #     ports:
+# #       - "9090:9090"
+# #     depends_on:
+# #       - db
 
-#   frontend:
-#     build:
-#       context: ../frontend
-#       dockerfile: Dockerfile   # Change to Dockerfile.frontend if needed
-#     container_name: frontend
-#     restart: unless-stopped
-#     ports:
-#       - "80:80"
-#     depends_on:
-#       - backend
+# #   frontend:
+# #     build:
+# #       context: ../frontend
+# #       dockerfile: Dockerfile   # Change to Dockerfile.frontend if needed
+# #     container_name: frontend
+# #     restart: unless-stopped
+# #     ports:
+# #       - "80:80"
+# #     depends_on:
+# #       - backend
 
-# volumes:
-#   mysql_data:
+# # volumes:
+# #   mysql_data:
+
+
 
 version: "3.8"
 
@@ -55,8 +57,9 @@ services:
 
   backend:
     build:
-      context: /var/jenkins_home/workspace/Library/Backend  # Absolute path to 'backend'
-      dockerfile: Dockerfile  # Ensure Dockerfile name is correct
+      context: /var/jenkins_home/workspace/Library/Backend
+      dockerfile: Dockerfile
+    image: LibraryContainer.azurecr.io/backend:latest  # Tag for ACR
     container_name: backend
     restart: unless-stopped
     ports:
@@ -66,8 +69,9 @@ services:
 
   frontend:
     build:
-      context: /var/jenkins_home/workspace/Library/Frontend  # Absolute path to 'frontend'
-      dockerfile: Dockerfile  # Ensure Dockerfile name is correct
+      context: /var/jenkins_home/workspace/Library/Frontend
+      dockerfile: Dockerfile
+    image: LibraryContainer.azurecr.io/frontend:latest  # Tag for ACR
     container_name: frontend
     restart: unless-stopped
     ports:
