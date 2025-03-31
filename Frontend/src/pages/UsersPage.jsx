@@ -25,7 +25,7 @@ export default function UsersPage() {
   // Delete user by ID
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://my-app-service:9090/api/users/${id}`, {
+      const response = await fetch(`http://57.158.185.84:31387/api/users/${id}`, {
         method: 'DELETE',
       });
 
