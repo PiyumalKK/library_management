@@ -91,10 +91,12 @@ spec:
       containers:
       - name: backend
         image: librarycontainer.azurecr.io/backend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
       - name: frontend
         image: librarycontainer.azurecr.io/frontend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
 ---

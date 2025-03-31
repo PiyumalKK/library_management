@@ -76,6 +76,21 @@ pipeline {
             }
         }
 
+        stage('Create Kubernetes Secret for ACR') {
+    steps {
+        bat '''
+            FOR /F "tokens=*" %%a IN ('az acr credential show -n %ACR_NAME% --query "username" -o tsv') DO SET ACR_USER=%%a
+            FOR /F "tokens=*" %%a IN ('az acr credential show -n %ACR_NAME% --query "passwords[0].value" -o tsv') DO SET ACR_PWD=%%a
+            
+            kubectl create secret docker-registry acr-auth ^
+              --docker-server=%ACR_LOGIN_SERVER% ^
+              --docker-username=%ACR_USER% ^
+              --docker-password=%ACR_PWD% ^
+              --dry-run=client -o yaml | kubectl apply -f -
+        '''
+    }
+}
+
         stage('Deploy to AKS') {
             steps {
                 bat '''
