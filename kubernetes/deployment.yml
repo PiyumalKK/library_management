@@ -1,40 +1,50 @@
+
 # apiVersion: apps/v1
 # kind: Deployment
 # metadata:
-#   name: my-app-deployment
+#   name: mysql-deployment
 # spec:
-#   replicas: 2
 #   selector:
 #     matchLabels:
-#       app: my-app
+#       app: mysql
 #   template:
 #     metadata:
 #       labels:
-#         app: my-app
+#         app: mysql
 #     spec:
 #       containers:
-#       - name: backend
-#         image: LibraryContainer.azurecr.io/backend:latest
+#       - name: mysql
+#         image: mysql:8.0
+#         env:
+#         - name: MYSQL_ROOT_PASSWORD
+#           value: foreverSmile
+#         - name: MYSQL_DATABASE
+#           value: MyLibrary
 #         ports:
-#         - containerPort: 8080
-#       - name: frontend
-#         image: LibraryContainer.azurecr.io/frontend:latest
-#         ports:
-#         - containerPort: 80
+#         - containerPort: 3306
+#         volumeMounts:
+#         - name: mysql-storage
+#           mountPath: /var/lib/mysql
+#       volumes:
+#       - name: mysql-storage
+#         emptyDir: {}
+
 # ---
+# # MySQL Service
 # apiVersion: v1
 # kind: Service
 # metadata:
-#   name: my-app-service
+#   name: db
 # spec:
 #   selector:
-#     app: my-app
+#     app: mysql
 #   ports:
 #     - protocol: TCP
-#       port: 80
-#       targetPort: 80
-#   type: LoadBalancer
+#       port: 3306
+#       targetPort: 3306
 
+# ---
+# # Application Deployment
 # apiVersion: apps/v1
 # kind: Deployment
 # metadata:
@@ -52,13 +62,29 @@
 #       containers:
 #       - name: backend
 #         image: librarycontainer.azurecr.io/backend:latest
+#         imagePullPolicy: Always
 #         ports:
-#         - containerPort: 8080
+#         - containerPort: 9090  # Must match server.port in application.properties
+#         env:
+#         - name: DB_HOST
+#           value: db
+#         - name: DB_PORT
+#           value: "3306"
+#         - name: DB_NAME
+#           value: "MyLibrary"
+#         - name: DB_USER
+#           value: "root"
+#         - name: DB_PASSWORD
+#           value: "foreverSmile"
+        
 #       - name: frontend
 #         image: librarycontainer.azurecr.io/frontend:latest
+#         imagePullPolicy: Always
 #         ports:
 #         - containerPort: 80
+
 # ---
+# # Application Service
 # apiVersion: v1
 # kind: Service
 # metadata:
@@ -72,6 +98,8 @@
 #       targetPort: 80
 #   type: LoadBalancer
 
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -101,9 +129,7 @@ spec:
       volumes:
       - name: mysql-storage
         emptyDir: {}
-
 ---
-# MySQL Service
 apiVersion: v1
 kind: Service
 metadata:
@@ -115,9 +141,7 @@ spec:
     - protocol: TCP
       port: 3306
       targetPort: 3306
-
 ---
-# Application Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -149,15 +173,12 @@ spec:
           value: "root"
         - name: DB_PASSWORD
           value: "foreverSmile"
-        
       - name: frontend
         image: librarycontainer.azurecr.io/frontend:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
-
 ---
-# Application Service
 apiVersion: v1
 kind: Service
 metadata:
