@@ -19,7 +19,7 @@ export default function AddTransactionPage() {
   }, []);
 
   const fetchBooks = () => {
-    fetch('http://localhost:9090/api/books')
+    fetch('http://my-app-service:9090/api/books')
       .then((response) => response.json())
       .then((data) => setBooks(data))
       .catch((error) => {
@@ -28,7 +28,7 @@ export default function AddTransactionPage() {
   };
 
   const fetchUsers = () => {
-    fetch('http://localhost:9090/api/users')
+    fetch('http://my-app-service:9090/api/users')
       .then((response) => response.json())
       .then((data) => setUsers(data))
       .catch((error) => {
@@ -46,7 +46,7 @@ export default function AddTransactionPage() {
       }
 
       try {
-        const url = `http://localhost:9090/api/transactions/issue?bookId=${selectedBook}&userId=${selectedUser}`;
+        const url = `http://my-app-service:9090/api/transactions/issue?bookId=${selectedBook}&userId=${selectedUser}`;
         const response = await fetch(url, {
           method: 'POST',
         });
@@ -68,7 +68,7 @@ export default function AddTransactionPage() {
       }
 
       try {
-        const url = `http://localhost:9090/api/transactions/return?transactionId=${transactionId}`;
+        const url = `http://my-app-service:9090/api/transactions/return?transactionId=${transactionId}`;
         const response = await fetch(url, {
           method: 'POST',
         });

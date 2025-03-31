@@ -11,7 +11,7 @@ export default function BooksPage() {
   }, []);
 
   const fetchBooks = () => {
-    fetch("http://localhost:9090/api/books")
+    fetch("http://my-app-service:9090/api/books")
       .then((response) => response.json())
       .then((data) => setBooks(data))
       .catch((error) => console.error("Error fetching books:", error));
@@ -21,7 +21,7 @@ export default function BooksPage() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this book?")) {
       try {
-        const response = await fetch(`http://localhost:9090/api/books/${id}`, {
+        const response = await fetch(`http://my-app-service:9090/api/books/${id}`, {
           method: "DELETE",
         });
 

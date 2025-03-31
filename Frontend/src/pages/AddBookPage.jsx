@@ -22,7 +22,7 @@ const AddBookPage = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://backend:9090/api/books", {
+      const response = await fetch("http://my-app-service:9090/api/books", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(book),
