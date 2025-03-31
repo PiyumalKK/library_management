@@ -1,3 +1,143 @@
+// pipeline {
+//     agent any
+
+//     environment {
+//         AZURE_CREDENTIALS = credentials('azure-credentials')
+//         AZ_TENANT_ID = '4f7d0492-1764-4824-8f60-f15e6d51cd70'
+//         ACR_NAME = 'LibraryContainer'
+//         ACR_LOGIN_SERVER = "librarycontainer.azurecr.io"
+//     }
+
+//     stages {
+//         stage('Prepare Environment') {
+//             steps {
+//                 script {
+//                     if (isUnix()) {
+//                         sh '''
+//                             sudo apt update
+//                             sudo apt install -y git docker-compose python3 python3-pip
+//                             pip3 install azure-cli
+//                         '''
+//                     } else {
+//                         bat '''
+//                             echo Installing required software...
+//                             choco install git docker-cli kubernetes-cli -y
+//                             pip install azure-cli
+//                         '''
+//                     }
+//                 }
+//             }
+//         }
+
+//         stage('Checkout Code') {
+//             steps {
+//                 deleteDir()
+//                 git url: 'https://github.com/PiyumalKK/library_management.git', branch: 'master'
+//             }
+//         }
+
+//         stage('Login to ACR') {
+//             steps {
+//                 bat '''
+//                     az login --service-principal -u %AZURE_CREDENTIALS_USR% -p %AZURE_CREDENTIALS_PSW% --tenant %AZ_TENANT_ID%
+//                     az acr login -n %ACR_NAME% --expose-token
+                    
+//                     REM Get direct admin credentials and use them for Docker login
+//                     FOR /F "tokens=*" %%a IN ('az acr credential show -n %ACR_NAME% --query "username" -o tsv') DO SET ACR_USER=%%a
+//                     FOR /F "tokens=*" %%a IN ('az acr credential show -n %ACR_NAME% --query "passwords[0].value" -o tsv') DO SET ACR_PWD=%%a
+//                     docker login %ACR_LOGIN_SERVER% -u %ACR_USER% -p %ACR_PWD%
+//                 '''
+//             }
+//         }
+
+//         stage('Build Backend JAR') {
+//             steps {
+//                 dir('Backend') {  // Go to Backend directory
+//                     bat 'mvn clean package'  // Run Maven build
+//                 }
+//             }
+//         }
+
+//         stage('Build and Tag Docker Images') {
+//             steps {
+//                 bat '''
+//                     cd Compose
+//                     docker-compose build
+//                 '''
+//             }
+//         }
+
+//         stage('Push to ACR') {
+//             steps {
+//                 bat '''
+//                     cd Compose
+//                     docker-compose push
+//                 '''
+//             }
+//         }
+
+//         stage('Create Kubernetes Secret for ACR') {
+//             steps {
+//                 bat '''
+//                     FOR /F "tokens=*" %%a IN ('az acr credential show -n %ACR_NAME% --query "username" -o tsv') DO SET ACR_USER=%%a
+//                     FOR /F "tokens=*" %%a IN ('az acr credential show -n %ACR_NAME% --query "passwords[0].value" -o tsv') DO SET ACR_PWD=%%a
+                    
+//                     kubectl create secret docker-registry acr-auth ^
+//                       --docker-server=%ACR_LOGIN_SERVER% ^
+//                       --docker-username=%ACR_USER% ^
+//                       --docker-password=%ACR_PWD% ^
+//                       --dry-run=client -o yaml | kubectl apply -f -
+//                 '''
+//             }
+//         }
+
+//         stage('Redeploy Both Backend and Frontend') {
+//             steps {
+//                 bat '''
+//                     az aks get-credentials --resource-group Devops --name library --overwrite-existing
+//                     kubectl config current-context
+//                     kubectl config use-context library
+//                     kubectl config view
+
+
+//                     echo Current directory:
+//                     cd
+                    
+//                     echo Listing kubernetes directory:
+//                     dir kubernetes
+                    
+//                     echo Applying deployment:
+//                     kubectl apply -f kubernetes/deployment.yml
+                    
+//                     echo Current deployments:
+//                     kubectl get deployments
+                    
+//                     kubectl rollout restart deployment mysql-deployment
+//                     kubectl rollout restart deployment my-app-deployment
+                    
+//                     echo Checking pod status:
+//                     kubectl get pods
+//                 '''
+//             }
+//         }
+//     }
+
+//     post {
+//         success {
+//             echo 'Pipeline completed successfully!'
+//         }
+//         failure {
+//             echo 'Pipeline failed. Please check the logs for details.'
+//         }
+//         always {
+//             echo 'Pipeline execution completed. Workspace preserved for inspection.'
+//         }
+//         unstable {
+//             echo 'Pipeline executed but some stages were unstable.'
+//         }
+//     }
+// }
+
 pipeline {
     agent any
 
@@ -52,8 +192,8 @@ pipeline {
 
         stage('Build Backend JAR') {
             steps {
-                dir('Backend') {  // Go to Backend directory
-                    bat 'mvn clean package'  // Run Maven build
+                dir('Backend') {
+                    bat 'mvn clean package'
                 }
             }
         }
@@ -93,13 +233,58 @@ pipeline {
 
         stage('Redeploy Both Backend and Frontend') {
             steps {
-                bat '''
-                    az aks get-credentials --resource-group Devops --name library --overwrite-existing
-                    kubectl apply -f kubernetes/deployment.yml  // Apply the changes to the deployment
-                    kubectl rollout restart deployment/my-app-deployment  // Restart the deployment to pick up the new images
-                '''
+                // Splitting into multiple bat steps to track each command's output
+                bat 'echo Step 1: Getting AKS credentials...'
+                bat 'az aks get-credentials --resource-group Devops --name library --overwrite-existing'
+                
+                bat 'echo Step 2: Current context:'
+                bat 'kubectl config current-context'
+                
+                bat 'echo Step 3: Using context "library":'
+                bat 'kubectl config use-context library'
+                
+                bat 'echo Step 4: Full kubeconfig view:'
+                bat 'kubectl config view'
+                
+                bat 'echo Step 5: Applying deployment YAML...'
+                bat 'kubectl apply -f kubernetes/deployment.yml'
+                
+                bat 'echo Step 6: Listing current deployments:'
+                bat 'kubectl get deployments'
+                
+                bat 'echo Step 7: Restarting mysql-deployment...'
+                bat 'kubectl rollout restart deployment mysql-deployment'
+                
+                bat 'echo Step 8: Restarting my-app-deployment...'
+                bat 'kubectl rollout restart deployment my-app-deployment'
+                
+                bat 'echo Step 9: Monitoring rollout status for mysql-deployment...'
+                bat 'kubectl rollout status deployment mysql-deployment'
+                
+                bat 'echo Step 10: Monitoring rollout status for my-app-deployment...'
+                bat 'kubectl rollout status deployment my-app-deployment'
+                
+                bat 'echo Step 11: Checking pod status...'
+                bat 'kubectl get pods'
+                
+                bat 'echo Step 12: Inspecting mysql-deployment for restartedAt annotation...'
+                bat 'kubectl get deployment mysql-deployment -o yaml | findstr restartedAt'
             }
         }
     }
-}
 
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Please check the logs for details.'
+        }
+        always {
+            echo 'Pipeline execution completed. Workspace preserved for inspection.'
+        }
+        unstable {
+            echo 'Pipeline executed but some stages were unstable.'
+        }
+    }
+}
