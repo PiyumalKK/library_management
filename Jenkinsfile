@@ -94,7 +94,7 @@ pipeline {
         stage('Deploy to AKS') {
             steps {
                 bat '''
-                    az aks get-credentials --resource-group Devops --name librarydev --overwrite-existing
+                    az aks get-credentials --resource-group Devops --name library --overwrite-existing
                     kubectl apply -f kubernetes/deployment.yml
                 '''
             }
