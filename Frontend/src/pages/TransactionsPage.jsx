@@ -7,7 +7,7 @@ export default function TransactionsPage() {
 
   // Fetch transactions from the API
   useEffect(() => {
-    fetch('http://57.158.185.84:31387/api/transactions')
+    fetch('http://57.158.185.84:9090/api/transactions')
       .then((response) => response.json())
       .then((data) => setTransactions(data))
       .catch((error) => console.error('Error fetching transactions:', error));

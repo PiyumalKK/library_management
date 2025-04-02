@@ -11,7 +11,7 @@ export default function BooksPage() {
   }, []);
 
   const fetchBooks = () => {
-    fetch("http://57.158.185.84:31387/api/books")
+    fetch("http://57.158.185.84:9090/api/books")
       .then((response) => response.json())
       .then((data) => setBooks(data))
       .catch((error) => console.error("Error fetching books:", error));
@@ -21,7 +21,7 @@ export default function BooksPage() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this book?")) {
       try {
-        const response = await fetch(`http://57.158.185.84:31387/api/books/${id}`, {
+        const response = await fetch(`http://57.158.185.84:9090/api/books/${id}`, {
           method: "DELETE",
         });
 
