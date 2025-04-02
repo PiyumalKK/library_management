@@ -208,18 +208,14 @@ kind: Deployment
 metadata:
   name: mysql-deployment
 spec:
-  selector:
-    matchLabels:
-      app: mysql
   template:
-    metadata:
-      labels:
-        app: mysql
     spec:
       containers:
       - name: mysql
         image: mysql:8.0
         env:
+        - name: MYSQL_ROOT_HOST  # 👈 Add this line
+          value: "%"            # 👈 Allow root access from any host
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
