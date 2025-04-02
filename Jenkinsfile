@@ -730,40 +730,41 @@ data:
         }
 
         stage('Redeploy Both Backend and Frontend') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh '''
-                            az aks get-credentials --resource-group Devops --name library --overwrite-existing
-                            kubectl config use-context library
-                            kubectl apply -f kubernetes/deployment.yml
-                            
-                            kubectl rollout restart deployment mysql-deployment
-                            kubectl rollout restart deployment my-app-deployment
-                            
-                            kubectl rollout status deployment mysql-deployment
-                            kubectl rollout status deployment my-app-deployment
-                            
-                            kubectl get pods
-                        '''
-                    } else {
-                        bat '''
-                            az aks get-credentials --resource-group Devops --name library --overwrite-existing
-                            kubectl config use-context library
-                            kubectl apply -f kubernetes\deployment.yml
-                            
-                            kubectl rollout restart deployment mysql-deployment
-                            kubectl rollout restart deployment my-app-deployment
-                            
-                            kubectl rollout status deployment mysql-deployment
-                            kubectl rollout status deployment my-app-deployment
-                            
-                            kubectl get pods
-                        '''
-                    }
-                }
+    steps {
+        script {
+            if (isUnix()) {
+                sh '''
+                    az aks get-credentials --resource-group Devops --name library --overwrite-existing
+                    kubectl config use-context library
+                    kubectl apply -f kubernetes/deployment.yml
+                    
+                    kubectl rollout restart deployment mysql-deployment
+                    kubectl rollout restart deployment my-app-deployment
+                    
+                    kubectl rollout status deployment mysql-deployment
+                    kubectl rollout status deployment my-app-deployment
+                    
+                    kubectl get pods
+                '''
+            } else {
+                bat '''
+                    az aks get-credentials --resource-group Devops --name library --overwrite-existing
+                    kubectl config use-context library
+                    kubectl apply -f kubernetes/deployment.yml
+                    
+                    kubectl rollout restart deployment mysql-deployment
+                    kubectl rollout restart deployment my-app-deployment
+                    
+                    kubectl rollout status deployment mysql-deployment
+                    kubectl rollout status deployment my-app-deployment
+                    
+                    kubectl get pods
+                '''
             }
         }
+    }
+}
+
     }
 
     post {
