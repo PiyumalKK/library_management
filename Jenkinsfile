@@ -297,6 +297,11 @@ pipeline {
         AZ_TENANT_ID = '4f7d0492-1764-4824-8f60-f15e6d51cd70'
         ACR_NAME = 'LibraryContainer'
         ACR_LOGIN_SERVER = "librarycontainer.azurecr.io"
+
+
+         DB_PASSWORD = credentials('db-password')
+         MYSQL_ROOT_PASSWORD = credentials('mysql-root-password')
+
     }
 
     stages {
@@ -417,51 +422,49 @@ pipeline {
             }
         }
 
-        stage('Create Kubernetes Secret for ACR') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh '''
-                            # Get AKS credentials
-                            az aks get-credentials --resource-group Devops --name library --overwrite-existing
-
-                            # Verify the current context
-                            kubectl config current-context
-
-                            # Get ACR credentials
-                            ACR_USER=$(az acr credential show -n $ACR_NAME --query "username" -o tsv)
-                            ACR_PWD=$(az acr credential show -n $ACR_NAME --query "passwords[0].value" -o tsv)
-                            
-                            # Create secret for Kubernetes ACR registry
-                            kubectl create secret docker-registry acr-auth \\
-                              --docker-server=$ACR_LOGIN_SERVER \\
-                              --docker-username=$ACR_USER \\
-                              --docker-password=$ACR_PWD \\
-                              --dry-run=client -o yaml | kubectl apply -f -
-                        '''
-                    } else {
-                        bat '''
-                            REM Get AKS credentials
-                            az aks get-credentials --resource-group Devops --name library --overwrite-existing
-
-                            REM Verify the current context
-                            kubectl config current-context
-
-                            REM Get ACR credentials
-                            FOR /F "tokens=*" %%a IN ('az acr credential show -n %ACR_NAME% --query "username" -o tsv') DO SET ACR_USER=%%a
-                            FOR /F "tokens=*" %%a IN ('az acr credential show -n %ACR_NAME% --query "passwords[0].value" -o tsv') DO SET ACR_PWD=%%a
-                            
-                            REM Create secret for Kubernetes ACR registry
-                            kubectl create secret docker-registry acr-auth ^
-                              --docker-server=%ACR_LOGIN_SERVER% ^
-                              --docker-username=%ACR_USER% ^
-                              --docker-password=%ACR_PWD% ^
-                              --dry-run=client -o yaml | kubectl apply -f -
-                        '''
-                    }
-                }
+       stage('Create Kubernetes Secrets') {
+    steps {
+        script {
+            if (isUnix()) {
+                sh '''
+                    # Base64 encode the sensitive data
+                    DB_PASSWORD_B64=$(echo -n $DB_PASSWORD | base64)
+                    
+                    # Create or update the Kubernetes secret
+                    cat << EOF | kubectl apply -f -
+                    apiVersion: v1
+                    kind: Secret
+                    metadata:
+                      name: mysql-secrets
+                    type: Opaque
+                    data:
+                      username: cm9vdA==
+                      password: $DB_PASSWORD_B64
+                      database: TXlMaWJyYXJ5
+                    EOF
+                '''
+            } else {
+                powershell '''
+                    # Base64 encode the sensitive data
+                    $DB_PASSWORD_B64 = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("$env:DB_PASSWORD"))
+                    
+                    # Create or update the Kubernetes secret
+                    @"
+                    apiVersion: v1
+                    kind: Secret
+                    metadata:
+                      name: mysql-secrets
+                    type: Opaque
+                    data:
+                      username: cm9vdA==
+                      password: Zm9yZXZlclNtaWxl
+                      database: TXlMaWJyYXJ5
+                    "@  | kubectl apply -f -
+                '''
             }
         }
+    }
+}
 
         stage('Redeploy Both Backend and Frontend') {
             steps {

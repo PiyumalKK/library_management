@@ -3,3 +3,4 @@ Infra/Terraform/
 .terraform/
 *.tfstate
 
+.env
