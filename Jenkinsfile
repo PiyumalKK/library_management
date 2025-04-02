@@ -457,7 +457,7 @@ pipeline {
                     type: Opaque
                     data:
                       username: cm9vdA==
-                      password: Zm9yZXZlclNtaWxl
+                      password: $DB_PASSWORD_B64
                       database: TXlMaWJyYXJ5
                     "@  | kubectl apply -f -
                 '''
