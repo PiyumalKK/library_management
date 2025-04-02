@@ -101,137 +101,27 @@
 
 
 
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: mysql-deployment
-# spec:
-#   selector:
-#     matchLabels:
-#       app: mysql
-#   template:
-#     metadata:
-#       labels:
-#         app: mysql
-#     spec:
-#       containers:
-#       - name: mysql
-#         image: mysql:8.0
-#         env:
-#         - name: MYSQL_ROOT_PASSWORD
-#           value: foreverSmile
-#         - name: MYSQL_DATABASE
-#           value: MyLibrary
-#         ports:
-#         - containerPort: 3306
-#         volumeMounts:
-#         - name: mysql-storage
-#           mountPath: /var/lib/mysql
-#       volumes:
-#       - name: mysql-storage
-#         emptyDir: {}
-
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: db
-# spec:
-#   selector:
-#     app: mysql
-#   ports:
-#     - protocol: TCP
-#       port: 3306
-#       targetPort: 3306
-#   clusterIP: None
-
-# ---
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: my-app-deployment
-# spec:
-#   replicas: 2
-#   selector:
-#     matchLabels:
-#       app: my-app
-#   template:
-#     metadata:
-#       labels:
-#         app: my-app
-#     spec:
-#       containers:
-#       - name: backend
-#         image: librarycontainer.azurecr.io/backend:latest
-#         imagePullPolicy: Always
-#         ports:
-#         - containerPort: 9090
-#         env:
-#         - name: DB_HOST
-#           value: db
-#         - name: DB_PORT
-#           value: "3306"
-#         - name: DB_NAME
-#           value: "MyLibrary"
-#         - name: DB_USER
-#           value: "root"
-#         - name: DB_PASSWORD
-#           value: "foreverSmile"
-#       - name: frontend
-#         image: librarycontainer.azurecr.io/frontend:latest
-#         imagePullPolicy: Always
-#         ports:
-#         - containerPort: 80
-
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: my-app-service
-# spec:
-#   selector:
-#     app: my-app
-#   ports:
-#     - name: frontend
-#       protocol: TCP
-#       port: 80
-#       targetPort: 80
-#     - name: backend
-#       protocol: TCP
-#       port: 9090
-#       targetPort: 9090
-#   type: LoadBalancer
-
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql-deployment
 spec:
-  selector:  # 👈 REQUIRED SELECTOR ADDED
+  selector:
     matchLabels:
       app: mysql
   template:
     metadata:
-      labels:  # 👈 MUST MATCH SELECTOR
+      labels:
         app: mysql
     spec:
       containers:
       - name: mysql
         image: mysql:8.0
         env:
-        - name: MYSQL_ROOT_HOST
-          value: "%"
         - name: MYSQL_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secrets
-              key: password
+          value: foreverSmile
         - name: MYSQL_DATABASE
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secrets
-              key: database
+          value: MyLibrary
         ports:
         - containerPort: 3306
         volumeMounts:
@@ -240,6 +130,7 @@ spec:
       volumes:
       - name: mysql-storage
         emptyDir: {}
+
 ---
 apiVersion: v1
 kind: Service
@@ -249,10 +140,11 @@ spec:
   selector:
     app: mysql
   ports:
-  - protocol: TCP
-    port: 3306
-    targetPort: 3306
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
   clusterIP: None
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -280,20 +172,11 @@ spec:
         - name: DB_PORT
           value: "3306"
         - name: DB_NAME
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secrets
-              key: database
+          value: "MyLibrary"
         - name: DB_USER
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secrets
-              key: username
+          value: "root"
         - name: DB_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mysql-secrets
-              key: password
+          value: "foreverSmile"
       - name: frontend
         image: librarycontainer.azurecr.io/frontend:latest
         imagePullPolicy: Always
@@ -317,4 +200,6 @@ spec:
       protocol: TCP
       port: 9090
       targetPort: 9090
-  type: LoadBalancer        
+  type: LoadBalancer
+
+

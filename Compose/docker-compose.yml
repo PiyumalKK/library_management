@@ -40,73 +40,26 @@
 
 
 
-# version: "3.8"
-
-# services:
-#   db:
-#     image: mysql:8.0
-#     container_name: db
-#     restart: unless-stopped
-#     environment:
-#       MYSQL_ROOT_PASSWORD: foreverSmile
-#       MYSQL_DATABASE: MyLibrary
-#     ports:
-#       - "3306:3306"
-#     volumes:
-#       - mysql_data:/var/lib/mysql
-
-#   backend:
-#     build:  # ✅ Fixed indentation issue here
-#       context: ../Backend
-#       dockerfile: Dockerfile
-#     image: librarycontainer.azurecr.io/backend:latest  # Tag for ACR
-#     container_name: backend
-#     restart: unless-stopped
-#     ports:
-#       - "9090:9090"
-#     environment:
-#       - DB_HOST=db
-#       - DB_PORT=3306
-#       - DB_NAME=MyLibrary
-#       - DB_USER=root
-#       - DB_PASSWORD=foreverSmile
-#     depends_on:
-#       - db
-
-#   frontend:
-#     build:
-#       context: ../Frontend
-#       dockerfile: Dockerfile
-#     image: librarycontainer.azurecr.io/frontend:latest  # Tag for ACR
-#     container_name: frontend
-#     restart: unless-stopped
-#     ports:
-#       - "80:80"
-#     depends_on:
-#       - backend
-
-# volumes:
-#   mysql_data:
-
-
 version: "3.8"
+
 services:
   db:
     image: mysql:8.0
     container_name: db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: foreverSmile
       MYSQL_DATABASE: MyLibrary
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+
   backend:
-    build:
+    build:  # ✅ Fixed indentation issue here
       context: ../Backend
       dockerfile: Dockerfile
-    image: librarycontainer.azurecr.io/backend:latest
+    image: librarycontainer.azurecr.io/backend:latest  # Tag for ACR
     container_name: backend
     restart: unless-stopped
     ports:
@@ -116,19 +69,23 @@ services:
       - DB_PORT=3306
       - DB_NAME=MyLibrary
       - DB_USER=root
-      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PASSWORD=foreverSmile
     depends_on:
       - db
+
   frontend:
     build:
       context: ../Frontend
       dockerfile: Dockerfile
-    image: librarycontainer.azurecr.io/frontend:latest
+    image: librarycontainer.azurecr.io/frontend:latest  # Tag for ACR
     container_name: frontend
     restart: unless-stopped
     ports:
       - "80:80"
     depends_on:
       - backend
+
 volumes:
   mysql_data:
+
+
