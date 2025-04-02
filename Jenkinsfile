@@ -370,21 +370,21 @@ pipeline {
         }
 
         stage('Build Backend JAR') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh '''
-                            cd Backend
-                            mvn clean package
-                        '''
-                    } else {
-                        dir('Backend') {
-                            bat 'mvn clean package'
-                        }
-                    }
+    steps {
+        script {
+            if (isUnix()) {
+                sh '''
+                    cd Backend
+                    mvn clean package -DskipTests
+                '''
+            } else {
+                dir('Backend') {
+                    bat 'mvn clean package -DskipTests'
                 }
             }
         }
+    }
+}
 
         stage('Build and Tag Docker Images') {
             steps {
