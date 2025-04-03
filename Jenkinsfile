@@ -769,9 +769,7 @@ pipeline {
                     kubectl rollout restart deployment mysql-deployment
                     kubectl rollout restart deployment my-app-deployment
 
-                    echo "Step 8: Monitoring rollout status..."
-                    kubectl rollout status deployment mysql-deployment
-                    kubectl rollout status deployment my-app-deployment
+                  
 
                     echo "Step 9: Checking pod status..."
                     kubectl get pods
@@ -815,9 +813,7 @@ pipeline {
                     kubectl rollout restart deployment mysql-deployment
                     kubectl rollout restart deployment my-app-deployment
 
-                    echo Step 8: Monitoring rollout status...
-                    kubectl rollout status deployment mysql-deployment
-                    kubectl rollout status deployment my-app-deployment
+                   
 
                     echo Step 9: Checking pod status...
                     kubectl get pods
