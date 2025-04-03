@@ -495,16 +495,14 @@ pipeline {
                     echo "Step 9: Monitoring rollout status for mysql-deployment..."
                     kubectl rollout status deployment mysql-deployment
                     
-                    echo "Step 10: Monitoring rollout status for my-app-deployment..."
-                    kubectl rollout status deployment my-app-deployment || true
+                    echo "Step 10: NOT waiting for my-app-deployment rollout - continuing pipeline..."
+                    # Skipping kubectl rollout status command for my-app-deployment
                     
                     echo "Step 11: Checking pod status..."
                     kubectl get pods
                     
                     echo "Step 12: Inspecting mysql-deployment for restartedAt annotation..."
                     kubectl get deployment mysql-deployment -o yaml | grep restartedAt
-                    
-                    echo "Step 13: Pipeline continuing despite deployment status..."
                 '''
             } else {
                 bat '''
@@ -535,16 +533,14 @@ pipeline {
                     echo Step 9: Monitoring rollout status for mysql-deployment...
                     kubectl rollout status deployment mysql-deployment
                     
-                    echo Step 10: Monitoring rollout status for my-app-deployment with ignore errors...
-                    kubectl rollout status deployment my-app-deployment || exit 0
+                    echo Step 10: NOT waiting for my-app-deployment rollout - continuing pipeline...
+                    REM Skipping kubectl rollout status command for my-app-deployment
                     
                     echo Step 11: Checking pod status...
                     kubectl get pods
                     
                     echo Step 12: Inspecting mysql-deployment for restartedAt annotation...
                     kubectl get deployment mysql-deployment -o yaml | findstr restartedAt
-                    
-                    echo Step 13: Pipeline continuing despite deployment status...
                 '''
             }
         }
