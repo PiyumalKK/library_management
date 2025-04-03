@@ -496,11 +496,13 @@ pipeline {
                     kubectl rollout status deployment mysql-deployment
 
                     echo "Step 10: Checking for CrashLoopBackOff pods in my-app-deployment..."
-                    failed_pod=$(kubectl get pods --selector=app=my-app-deployment --no-headers | awk '$3=="CrashLoopBackOff" {print $1}' | head -n 1)
+                    failed_pod=$(kubectl get pods --no-headers | awk '$3=="CrashLoopBackOff" {print $1}' | head -n 1)
 
                     if [ -n "$failed_pod" ]; then
                         echo "Deleting failing pod: $failed_pod"
                         kubectl delete pod $failed_pod
+                        echo "Waiting 10 seconds for the new pod to start..."
+                        sleep 10
                     else
                         echo "No pods in CrashLoopBackOff state."
                     fi
@@ -544,9 +546,11 @@ pipeline {
                     kubectl rollout status deployment mysql-deployment
 
                     echo Step 10: Checking for CrashLoopBackOff pods in my-app-deployment...
-                    FOR /F "tokens=1" %%i IN ('kubectl get pods --selector=app=my-app-deployment --no-headers ^| findstr CrashLoopBackOff ^| head -n 1') DO (
+                    FOR /F "tokens=1" %%i IN ('kubectl get pods --no-headers ^| findstr CrashLoopBackOff ^| head -n 1') DO (
                         echo Deleting failing pod %%i
                         kubectl delete pod %%i
+                        echo Waiting 10 seconds for the new pod to start...
+                        timeout /T 10
                     )
 
                     echo Step 11: Monitoring rollout status for my-app-deployment...
