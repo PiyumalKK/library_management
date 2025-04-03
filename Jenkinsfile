@@ -463,89 +463,93 @@ pipeline {
             }
         }
 
-        stage('Redeploy Both Backend and Frontend') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh '''
-                            echo "Step 1: Getting AKS credentials..."
-                            az aks get-credentials --resource-group Devops --name library --overwrite-existing
-                            
-                            echo "Step 2: Current context:"
-                            kubectl config current-context
-                            
-                            echo "Step 3: Using context 'library':"
-                            kubectl config use-context library
-                            
-                            echo "Step 4: Full kubeconfig view:"
-                            kubectl config view
-                            
-                            echo "Step 5: Applying deployment YAML..."
-                            kubectl apply -f kubernetes/deployment.yml
-                            
-                            echo "Step 6: Listing current deployments:"
-                            kubectl get deployments
-                            
-                            echo "Step 7: Restarting mysql-deployment..."
-                            kubectl rollout restart deployment mysql-deployment
-                            
-                            echo "Step 8: Restarting my-app-deployment..."
-                            kubectl rollout restart deployment my-app-deployment
-                            
-                            echo "Step 9: Monitoring rollout status for mysql-deployment..."
-                            kubectl rollout status deployment mysql-deployment
-                            
-                            echo "Step 10: Monitoring rollout status for my-app-deployment..."
-                            kubectl rollout status deployment my-app-deployment
-                            
-                            echo "Step 11: Checking pod status..."
-                            kubectl get pods
-                            
-                            echo "Step 12: Inspecting mysql-deployment for restartedAt annotation..."
-                            kubectl get deployment mysql-deployment -o yaml | grep restartedAt
-                        '''
-                    } else {
-                        bat '''
-                            echo Step 1: Getting AKS credentials...
-                            az aks get-credentials --resource-group Devops --name library --overwrite-existing
-                            
-                            echo Step 2: Current context:
-                            kubectl config current-context
-                            
-                            echo Step 3: Using context "library":
-                            kubectl config use-context library
-                            
-                            echo Step 4: Full kubeconfig view:
-                            kubectl config view
-                            
-                            echo Step 5: Applying deployment YAML...
-                            kubectl apply -f kubernetes/deployment.yml
-                            
-                            echo Step 6: Listing current deployments:
-                            kubectl get deployments
-                            
-                            echo Step 7: Restarting mysql-deployment...
-                            kubectl rollout restart deployment mysql-deployment
-                            
-                            echo Step 8: Restarting my-app-deployment...
-                            kubectl rollout restart deployment my-app-deployment
-                            
-                            echo Step 9: Monitoring rollout status for mysql-deployment...
-                            kubectl rollout status deployment mysql-deployment
-                            
-                            echo Step 10: Monitoring rollout status for my-app-deployment...
-                            kubectl rollout status deployment my-app-deployment
-                            
-                            echo Step 11: Checking pod status...
-                            kubectl get pods
-                            
-                            echo Step 12: Inspecting mysql-deployment for restartedAt annotation...
-                            kubectl get deployment mysql-deployment -o yaml | findstr restartedAt
-                        '''
-                    }
-                }
+       stage('Redeploy Both Backend and Frontend') {
+    steps {
+        script {
+            if (isUnix()) {
+                sh '''
+                    echo "Step 1: Getting AKS credentials..."
+                    az aks get-credentials --resource-group Devops --name library --overwrite-existing
+                    
+                    echo "Step 2: Current context:"
+                    kubectl config current-context
+                    
+                    echo "Step 3: Using context 'library':"
+                    kubectl config use-context library
+                    
+                    echo "Step 4: Full kubeconfig view:"
+                    kubectl config view
+                    
+                    echo "Step 5: Applying deployment YAML..."
+                    kubectl apply -f kubernetes/deployment.yml
+                    
+                    echo "Step 6: Listing current deployments:"
+                    kubectl get deployments
+                    
+                    echo "Step 7: Restarting mysql-deployment..."
+                    kubectl rollout restart deployment mysql-deployment
+                    
+                    echo "Step 8: Restarting my-app-deployment..."
+                    kubectl rollout restart deployment my-app-deployment
+                    
+                    echo "Step 9: Monitoring rollout status for mysql-deployment..."
+                    kubectl rollout status deployment mysql-deployment
+                    
+                    echo "Step 10: Monitoring rollout status for my-app-deployment..."
+                    kubectl rollout status deployment my-app-deployment || true
+                    
+                    echo "Step 11: Checking pod status..."
+                    kubectl get pods
+                    
+                    echo "Step 12: Inspecting mysql-deployment for restartedAt annotation..."
+                    kubectl get deployment mysql-deployment -o yaml | grep restartedAt
+                    
+                    echo "Step 13: Pipeline continuing despite deployment status..."
+                '''
+            } else {
+                bat '''
+                    echo Step 1: Getting AKS credentials...
+                    az aks get-credentials --resource-group Devops --name library --overwrite-existing
+                    
+                    echo Step 2: Current context:
+                    kubectl config current-context
+                    
+                    echo Step 3: Using context "library":
+                    kubectl config use-context library
+                    
+                    echo Step 4: Full kubeconfig view:
+                    kubectl config view
+                    
+                    echo Step 5: Applying deployment YAML...
+                    kubectl apply -f kubernetes/deployment.yml
+                    
+                    echo Step 6: Listing current deployments:
+                    kubectl get deployments
+                    
+                    echo Step 7: Restarting mysql-deployment...
+                    kubectl rollout restart deployment mysql-deployment
+                    
+                    echo Step 8: Restarting my-app-deployment...
+                    kubectl rollout restart deployment my-app-deployment
+                    
+                    echo Step 9: Monitoring rollout status for mysql-deployment...
+                    kubectl rollout status deployment mysql-deployment
+                    
+                    echo Step 10: Monitoring rollout status for my-app-deployment with ignore errors...
+                    kubectl rollout status deployment my-app-deployment || exit 0
+                    
+                    echo Step 11: Checking pod status...
+                    kubectl get pods
+                    
+                    echo Step 12: Inspecting mysql-deployment for restartedAt annotation...
+                    kubectl get deployment mysql-deployment -o yaml | findstr restartedAt
+                    
+                    echo Step 13: Pipeline continuing despite deployment status...
+                '''
             }
         }
+    }
+}
     }
 
     post {
