@@ -21,7 +21,7 @@ export default function AddUserPage() {
     const newUser = { name, email, role };
 
     try {
-      const response = await fetch("http://57.158.185.84:9090/api/users", {
+      const response = await fetch("http://57.158.146.246:9090/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),

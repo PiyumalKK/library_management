@@ -13,7 +13,7 @@ export default function UsersPage() {
 
   // Function to fetch users
   const fetchUsers = () => {
-    fetch('http://57.158.185.84:9090/api/users')
+    fetch('http://57.158.146.246:9090/api/users')
       .then((response) => response.json())
       .then((data) => setUsers(data))
       .catch((error) => {
@@ -25,7 +25,7 @@ export default function UsersPage() {
   // Delete user by ID
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://57.158.185.84:9090/api/users/${id}`, {
+      const response = await fetch(`http://57.158.146.246:9090/api/users/${id}`, {
         method: 'DELETE',
       });
 
