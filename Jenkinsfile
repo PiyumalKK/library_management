@@ -824,7 +824,7 @@ pipeline {
             }
         }
 
-        stage('Redeploy Both Backend and Frontend') {
+        stage('Redeploy Both Backend and Frontend 2') {
             steps {
                 script {
                     if (isUnix()) {
