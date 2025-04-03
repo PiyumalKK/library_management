@@ -329,11 +329,19 @@ pipeline {
         }
 
         stage('Checkout Code') {
-            steps {
-                deleteDir()
-                git url: 'https://github.com/PiyumalKK/library_management.git', branch: 'master'
-            }
+    steps {
+        deleteDir() // Ensure workspace is clean
+        script {
+            git branch: 'master',
+                url: 'https://github.com/PiyumalKK/library_management.git'
+            sh '''
+                git fetch --all
+                git reset --hard origin/master
+            '''
         }
+    }
+}
+
 
         stage('Login to ACR') {
             steps {
