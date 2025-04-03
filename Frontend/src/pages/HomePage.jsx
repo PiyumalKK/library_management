@@ -7,7 +7,7 @@ export default function HomePage() {
       <section className="relative bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-6 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            Welcome to MyLibrary Management System updated
+            Welcome to MyLibrary Management System
           </h1>
           <p className="text-lg md:text-xl mb-8">
             Manage books, users, and transactions efficiently with our simple and powerful system.
