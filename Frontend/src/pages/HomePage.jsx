@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 export default function HomePage() {
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Hero Section */}
+      {/* Hero Sectin */}
       <section className="relative bg-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-6 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            Welcome to MyLibrary Management System Piyumal AABB Piyu
+            Welcome to MyLibrary Management System
           </h1>
           <p className="text-lg md:text-xl mb-8">
             Manage books, users, and transactions efficiently with our simple and powerful system.
